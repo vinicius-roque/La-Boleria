@@ -9,11 +9,9 @@ async function createCake(req, res) {
                [name, price, image, description]
           ); 
 
-          res.sendStatus(201);
-          return
+          return res.sendStatus(201);
      } catch (error) {
-          res.status(500).send(error.message);
-          return
+          return res.status(500).send(error.message);
      }
 }
 
