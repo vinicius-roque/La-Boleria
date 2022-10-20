@@ -11,9 +11,8 @@ server.use(cors());
 server.use(express.json());
 
 server.get('/status', async (req, res) => {
-    //const result = await connection.query('SELECT 1=1;');
-    //res.send(result.rows);
-    return res.sendStatus(200);
+    const result = await connection.query('SELECT 1=1;');
+    res.send(result.rows);
 });
 
 server.use(cakesRouter);
