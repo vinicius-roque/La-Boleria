@@ -13,7 +13,10 @@ async function createOrders(req, res) {
     } catch (error) {
         return res.status(404).send("This client or cake doesn't exists");
     }
-    //remember to add createdAt value and correct  404 request
 }
 
-export { createOrders };
+async function showOrders(req, res) {
+
+}
+
+export { createOrders, showOrders };
