@@ -3,8 +3,8 @@ import joi from 'joi';
 const ordersSchema = joi.object({
     clientId: joi.number().integer().required(),
     cakeId: joi.number().integer().required(),
-    quantity: joi.number().integer().required(),
-    totalPrice: joi.number().required(),
+    quantity: joi.number().integer().positive().required(),
+    totalPrice: joi.number().positive().required(),
 });
 
 async function validateOrders(req, res, next) {

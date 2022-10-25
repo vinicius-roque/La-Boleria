@@ -15,6 +15,4 @@ server.use(cakesRouter);
 server.use(clientsRouter);
 server.use(ordersRouter);
 
-server.listen(process.env.PORT, () => {
-    console.log(`Listening on port ${process.env.PORT}`);
-});
+server.listen(process.env.PORT, console.log(`Listening on port ${process.env.PORT}`));
