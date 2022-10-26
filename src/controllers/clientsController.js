@@ -16,7 +16,7 @@ async function createClient(req, res) {
 }
 
 async function showClientsOrders(req, res) {
-    const {id} = req.params;
+    const { id } = req.params;
     
     const existingId = await connection.query(
         'SELECT FROM clients WHERE id = $1;', [id]
@@ -27,11 +27,11 @@ async function showClientsOrders(req, res) {
     }
 
     try {
-        const orders = await connection.query(
+        const requests = await connection.query(
             'SELECT orders.id AS "orderId", orders.quantity, orders."createdAt", orders."totalPrice", cakes.name AS "cakeName" FROM orders JOIN cakes ON cakes.id = orders."cakeId" WHERE orders."clientId" = $1 ORDER BY orders."createdAt" DESC;', [id]
         );
 
-        return res.status(200).send(orders.rows.map(value => (
+        return res.status(200).send(requests.rows.map(value => (
             {
                 orderId: value.orderId,
                 quantity: value.quantity,
