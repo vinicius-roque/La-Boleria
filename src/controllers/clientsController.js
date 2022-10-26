@@ -27,11 +27,19 @@ async function showClientsOrders(req, res) {
     }
 
     try {
-        const { rows : orders } = await connection.query(
+        const orders = await connection.query(
             'SELECT orders.id AS "orderId", orders.quantity, orders."createdAt", orders."totalPrice", cakes.name AS "cakeName" FROM orders JOIN cakes ON cakes.id = orders."cakeId" WHERE orders."clientId" = $1 ORDER BY orders."createdAt" DESC;', [id]
         );
 
-        return res.status(200).send(orders);
+        return res.status(200).send(orders.rows.map(value => (
+            {
+                orderId: value.orderId,
+                quantity: value.quantity,
+                createdAt: `${value.createdAt.getFullYear()}-${value.createdAt.getMonth()}-${value.createdAt.getDate()} ${value.createdAt.getHours()}:${value.createdAt.getMinutes()}`,
+                totalPrice: value.totalPrice,
+                cakeName: value.cakeName
+            }
+        )));
     } catch (error) {
         return res.status(500).send(error.message);
     }
