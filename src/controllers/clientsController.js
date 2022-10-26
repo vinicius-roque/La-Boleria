@@ -16,7 +16,25 @@ async function createClient(req, res) {
 }
 
 async function showClientsOrders(req, res) {
+    const {id} = req.params;
+    
+    const existingId = await connection.query(
+        'SELECT FROM clients WHERE id = $1;', [id]
+    );
 
+    if(existingId.rows.length === 0) {
+        return res.status(404).send("This client doesn't exists!");
+    }
+
+    try {
+        const { rows : orders } = await connection.query(
+            'SELECT orders.id AS "orderId", orders.quantity, orders."createdAt", orders."totalPrice", cakes.name AS "cakeName" FROM orders JOIN cakes ON cakes.id = orders."cakeId" WHERE orders."clientId" = $1 ORDER BY orders."createdAt" DESC;', [id]
+        );
+
+        return res.status(200).send(orders);
+    } catch (error) {
+        return res.status(500).send(error.message);
+    }
 }
 
 export { createClient, showClientsOrders };
