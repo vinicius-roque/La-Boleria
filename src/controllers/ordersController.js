@@ -106,8 +106,4 @@ async function showOrdersById(req, res) {
     }
 }
 
-async function showClientsOrders(req, res) {
-
-}
-
-export { createOrders, showOrders, showOrdersById, showClientsOrders };
+export { createOrders, showOrders, showOrdersById };

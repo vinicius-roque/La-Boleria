@@ -15,4 +15,8 @@ async function createClient(req, res) {
     }
 }
 
-export { createClient };
+async function showClientsOrders(req, res) {
+
+}
+
+export { createClient, showClientsOrders };
