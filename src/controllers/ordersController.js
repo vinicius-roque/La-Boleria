@@ -26,46 +26,84 @@ async function showOrders(req, res) {
         if(date) {
             const dateFormat = new Date(date);
 
-            requests.rows = requests.rows.filter(time => (time.createdAt.getDate() == dateFormat.getDate() &&
+            requests.rows = requests.rows.filter(time => time.createdAt.getDate() == dateFormat.getDate() &&
                 time.createdAt.getMonth() == dateFormat.getMonth() &&     
                 time.createdAt.getFullYear() == dateFormat.getFullYear()
-            ));
+            );
         }
 
         if(!requests.rows.length) {
             return res.status(404).send([]);
         }
 
-        const fullList = requests.rows.map(time => (
+        return res.status(200).send(requests.rows.map(value => (
             {
                 client: {
-                    id: time.clientId,
-                    name: time.clientName,
-                    address: time.address,
-                    phone: time.phone
+                    id: value.clientId,
+                    name: value.clientName,
+                    address: value.address,
+                    phone: value.phone
                 },
                 cake: {
-                    id: time.cakeId,
-                    name: time.cakeName,
-                    price: time.price,
-                    description: time.description,
-                    image: time.image
+                    id: value.cakeId,
+                    name: value.cakeName,
+                    price: value.price,
+                    description: value.description,
+                    image: value.image
                 },
-                orderId: time.orderId,
-                createdAt: `${date} ${time.createdAt.getHours()}:${time.createdAt.getMinutes()}`,
-                quantity: time.quantity,
-                totalPrice: time.totalPrice
+                orderId: value.orderId,
+                createdAt: `${value.createdAt.getFullYear()}-${value.createdAt.getMonth()}-${value.createdAt.getDate()} ${value.createdAt.getHours()}:${value.createdAt.getMinutes()}`,
+                quantity: value.quantity,
+                totalPrice: value.totalPrice
             }
-        ));
-
-        return res.status(200).send(fullList);
+        )));
     } catch (error) {
         return res.status(500).send(error.message);
     }
 }
 
 async function showOrdersById(req, res) {
-    
+    const { id } = req.params;
+
+    const existingId = await connection.query(
+        'SELECT id FROM orders WHERE id = $1;', [id]
+    );
+
+    if(!existingId) {
+        return res.status(404).send("This order doesn't exists");
+    }
+
+    try {
+        const { rows : orders } = await connection.query(
+            `SELECT orders.id AS "orderId", orders."createdAt", orders.quantity, orders."totalPrice", clients.id AS "clientId", clients.name AS "clientName", clients.address, clients.phone, cakes.id AS "cakeId", cakes.name AS "cakeName", cakes.price, cakes.description, cakes.image FROM orders JOIN clients ON orders."clientId" = clients.id JOIN cakes ON orders."cakeId" = cakes.id WHERE orders.id=$1;`, [id]
+        );
+
+        return res.status(200).send(
+            orders.map((value) => {
+                return {
+                    client: {
+                        id: value.clientId,
+                        name: value.clientName,
+                        address: value.address,
+                        phone: value.phone
+                    },
+                    cake: {
+                        id: value.cakeId,
+                        name: value.cakeName,
+                        price: value.price,
+                        description: value.description,
+                        image: value.image
+                    },
+                    orderId: value.orderId,
+                    createdAt: `${value.createdAt.getFullYear()}-${value.createdAt.getMonth()}-${value.createdAt.getDate()} ${value.createdAt.getHours()}:${value.createdAt.getMinutes()}`,
+                    quantity: value.quantity,
+                    totalPrice: value.totalPrice
+                };
+            })
+        );
+    } catch (error) {
+        return res.status(500).send(error.message);
+    }
 }
 
 async function showClientsOrders(req, res) {
